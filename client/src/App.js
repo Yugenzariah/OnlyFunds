@@ -4,15 +4,19 @@ import './styles/App.css';
 import SubscriptionForm from './components/SubscriptionForm';
 import SubscriptionList from './components/SubscriptionList';
 import Stats from './components/Stats';
+import SalarySettings from './components/SalarySettings';
 
 function App() {
   const [subscriptions, setSubscriptions] = useState([]);
+  const [salary, setSalary] = useState(null);
   const [showForm, setShowForm] = useState(false);
+  const [showSalarySettings, setShowSalarySettings] = useState(false);
   const [editingSubscription, setEditingSubscription] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetchSubscriptions();
+    fetchSalary();
   }, []);
 
   const fetchSubscriptions = async () => {
@@ -23,6 +27,15 @@ function App() {
     } catch (error) {
       console.error('Error fetching subscriptions:', error);
       setLoading(false);
+    }
+  };
+
+  const fetchSalary = async () => {
+    try {
+      const response = await axios.get('/api/salary');
+      setSalary(response.data);
+    } catch (error) {
+      console.error('Error fetching salary:', error);
     }
   };
 
@@ -71,16 +84,25 @@ function App() {
     <div className="app">
       <header className="header">
         <div className="header-content">
-          <h1 className="title">Subscriptions</h1>
-          <button 
-            className="add-button"
-            onClick={() => {
-              setEditingSubscription(null);
-              setShowForm(!showForm);
-            }}
-          >
-            {showForm ? '×' : '+'}
-          </button>
+          <h1 className="title">Yugens Hub</h1>
+          <div className="header-actions">
+            <button 
+              className="settings-button"
+              onClick={() => setShowSalarySettings(true)}
+              title="Income Settings"
+            >
+              $
+            </button>
+            <button 
+              className="add-button"
+              onClick={() => {
+                setEditingSubscription(null);
+                setShowForm(!showForm);
+              }}
+            >
+              {showForm ? '×' : '+'}
+            </button>
+          </div>
         </div>
       </header>
 
@@ -97,8 +119,15 @@ function App() {
             />
           )}
 
+          {showSalarySettings && (
+            <SalarySettings 
+              onClose={() => setShowSalarySettings(false)}
+              onUpdate={fetchSalary}
+            />
+          )}
+
           {!loading && subscriptions.length > 0 && (
-            <Stats subscriptions={subscriptions} />
+            <Stats subscriptions={subscriptions} salary={salary} />
           )}
 
           {loading ? (
