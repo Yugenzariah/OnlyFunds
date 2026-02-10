@@ -36,18 +36,22 @@ const subscriptionSchema = new mongoose.Schema({
 // Virtual field to calculate next payment date
 subscriptionSchema.virtual('nextPaymentDate').get(function() {
   const lastDate = new Date(this.lastPaymentDate);
-  const nextDate = new Date(lastDate);
+  const today = new Date();
+  let nextDate = new Date(lastDate);
   
-  switch(this.billingCycle) {
-    case 'weekly':
-      nextDate.setDate(lastDate.getDate() + 7);
-      break;
-    case 'monthly':
-      nextDate.setMonth(lastDate.getMonth() + 1);
-      break;
-    case 'yearly':
-      nextDate.setFullYear(lastDate.getFullYear() + 1);
-      break;
+  // Keep adding billing cycles until we get a future date
+  while (nextDate <= today) {
+    switch(this.billingCycle) {
+      case 'weekly':
+        nextDate.setDate(nextDate.getDate() + 7);
+        break;
+      case 'monthly':
+        nextDate.setMonth(nextDate.getMonth() + 1);
+        break;
+      case 'yearly':
+        nextDate.setFullYear(nextDate.getFullYear() + 1);
+        break;
+    }
   }
   
   return nextDate;
