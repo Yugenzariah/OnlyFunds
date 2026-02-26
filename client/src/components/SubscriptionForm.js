@@ -83,6 +83,7 @@ const SubscriptionForm = ({ onSubmit, onCancel, initialData }) => {
             onChange={handleChange}
           >
             <option value="weekly">Weekly</option>
+            <option value="fortnightly">Fortnightly</option>
             <option value="monthly">Monthly</option>
             <option value="yearly">Yearly</option>
           </select>

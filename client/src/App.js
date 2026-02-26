@@ -4,19 +4,21 @@ import './styles/App.css';
 import SubscriptionForm from './components/SubscriptionForm';
 import SubscriptionList from './components/SubscriptionList';
 import Stats from './components/Stats';
-import SalarySettings from './components/SalarySettings';
+import IncomeManager from './components/IncomeManager';
+import SavingsCalculator from './components/SavingsCalculator';
 
 function App() {
   const [subscriptions, setSubscriptions] = useState([]);
-  const [salary, setSalary] = useState(null);
+  const [incomes, setIncomes] = useState([]);
   const [showForm, setShowForm] = useState(false);
-  const [showSalarySettings, setShowSalarySettings] = useState(false);
+  const [showIncomeManager, setShowIncomeManager] = useState(false);
+  const [showSavingsCalculator, setShowSavingsCalculator] = useState(false);
   const [editingSubscription, setEditingSubscription] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetchSubscriptions();
-    fetchSalary();
+    fetchIncomes();
   }, []);
 
   const fetchSubscriptions = async () => {
@@ -30,12 +32,12 @@ function App() {
     }
   };
 
-  const fetchSalary = async () => {
+  const fetchIncomes = async () => {
     try {
-      const response = await axios.get('/api/salary');
-      setSalary(response.data);
+      const response = await axios.get('/api/income');
+      setIncomes(response.data);
     } catch (error) {
-      console.error('Error fetching salary:', error);
+      console.error('Error fetching incomes:', error);
     }
   };
 
@@ -88,8 +90,15 @@ function App() {
           <div className="header-actions">
             <button 
               className="settings-button"
-              onClick={() => setShowSalarySettings(true)}
-              title="Income Settings"
+              onClick={() => setShowSavingsCalculator(true)}
+              title="Savings Calculator"
+            >
+              📊
+            </button>
+            <button 
+              className="settings-button"
+              onClick={() => setShowIncomeManager(true)}
+              title="Income Streams"
             >
               $
             </button>
@@ -119,15 +128,23 @@ function App() {
             />
           )}
 
-          {showSalarySettings && (
-            <SalarySettings 
-              onClose={() => setShowSalarySettings(false)}
-              onUpdate={fetchSalary}
+          {showIncomeManager && (
+            <IncomeManager 
+              onClose={() => setShowIncomeManager(false)}
+              onUpdate={fetchIncomes}
+            />
+          )}
+
+          {showSavingsCalculator && (
+            <SavingsCalculator
+              subscriptions={subscriptions}
+              incomes={incomes}
+              onClose={() => setShowSavingsCalculator(false)}
             />
           )}
 
           {!loading && subscriptions.length > 0 && (
-            <Stats subscriptions={subscriptions} salary={salary} />
+            <Stats subscriptions={subscriptions} incomes={incomes} />
           )}
 
           {loading ? (

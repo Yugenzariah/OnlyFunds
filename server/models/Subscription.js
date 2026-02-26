@@ -14,7 +14,7 @@ const subscriptionSchema = new mongoose.Schema({
   billingCycle: {
     type: String,
     required: true,
-    enum: ['weekly', 'monthly', 'yearly'],
+    enum: ['weekly', 'fortnightly', 'monthly', 'yearly'],
     default: 'monthly'
   },
   lastPaymentDate: {
@@ -44,6 +44,9 @@ subscriptionSchema.virtual('nextPaymentDate').get(function() {
     switch(this.billingCycle) {
       case 'weekly':
         nextDate.setDate(nextDate.getDate() + 7);
+        break;
+      case 'fortnightly':
+        nextDate.setDate(nextDate.getDate() + 14);
         break;
       case 'monthly':
         nextDate.setMonth(nextDate.getMonth() + 1);

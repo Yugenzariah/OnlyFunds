@@ -1,6 +1,6 @@
 import React from 'react';
 
-const Stats = ({ subscriptions, salary }) => {
+const Stats = ({ subscriptions, incomes }) => {
   const calculateTotal = (cycle) => {
     return subscriptions
       .filter(sub => sub.isActive)
@@ -9,7 +9,10 @@ const Stats = ({ subscriptions, salary }) => {
         
         switch(sub.billingCycle) {
           case 'weekly':
-            monthlyCost = sub.cost * 4.33; // Average weeks per month
+            monthlyCost = sub.cost * 4.33;
+            break;
+          case 'fortnightly':
+            monthlyCost = sub.cost * 2.165;
             break;
           case 'monthly':
             monthlyCost = sub.cost;
@@ -29,67 +32,97 @@ const Stats = ({ subscriptions, salary }) => {
       }, 0);
   };
 
+  // Calculate total income from all streams
+  const calculateTotalIncome = (cycle) => {
+    if (!incomes || incomes.length === 0) return 0;
+
+    return incomes
+      .filter(inc => inc.isActive)
+      .reduce((total, inc) => {
+        let monthlyIncome = 0;
+        
+        switch(inc.frequency) {
+          case 'weekly':
+            monthlyIncome = inc.amount * 4.33;
+            break;
+          case 'fortnightly':
+            monthlyIncome = inc.amount * 2.165;
+            break;
+          case 'monthly':
+            monthlyIncome = inc.amount;
+            break;
+          case 'yearly':
+            monthlyIncome = inc.amount / 12;
+            break;
+          default:
+            monthlyIncome = 0;
+        }
+        
+        if (cycle === 'monthly') return total + monthlyIncome;
+        if (cycle === 'yearly') return total + (monthlyIncome * 12);
+        if (cycle === 'weekly') return total + (monthlyIncome / 4.33);
+        
+        return total;
+      }, 0);
+  };
+
   const weeklySubscriptions = calculateTotal('weekly');
   const monthlySubscriptions = calculateTotal('monthly');
   const yearlySubscriptions = calculateTotal('yearly');
   const activeCount = subscriptions.filter(sub => sub.isActive).length;
 
-  const weeklySalary = salary?.weeklySalary || 0;
-  const monthlySalary = salary?.monthlySalary || 0;
+  const weeklyIncome = calculateTotalIncome('weekly');
+  const monthlyIncome = calculateTotalIncome('monthly');
+  const yearlyIncome = calculateTotalIncome('yearly');
 
-  // Calculate yearly income from monthly salary
-  const yearlyIncome = monthlySalary * 12;
-
-  const weeklyRemaining = weeklySalary - weeklySubscriptions;
-  const monthlyRemaining = monthlySalary - monthlySubscriptions;
+  const weeklyRemaining = weeklyIncome - weeklySubscriptions;
+  const monthlyRemaining = monthlyIncome - monthlySubscriptions;
   const yearlyRemaining = yearlyIncome - yearlySubscriptions;
 
-  const weeklyPercentage = weeklySalary > 0 
-    ? ((weeklySubscriptions / weeklySalary) * 100).toFixed(1)
+  const weeklyPercentage = weeklyIncome > 0 
+    ? ((weeklySubscriptions / weeklyIncome) * 100).toFixed(1)
     : 0;
-  const monthlyPercentage = monthlySalary > 0 
-    ? ((monthlySubscriptions / monthlySalary) * 100).toFixed(1)
+  const monthlyPercentage = monthlyIncome > 0 
+    ? ((monthlySubscriptions / monthlyIncome) * 100).toFixed(1)
     : 0;
   const yearlyPercentage = yearlyIncome > 0 
     ? ((yearlySubscriptions / yearlyIncome) * 100).toFixed(1)
     : 0;
 
+  const hasIncome = incomes && incomes.length > 0;
+
   return (
     <div className="stats-container">
       {/* Income Stats */}
-      {(weeklySalary > 0 || monthlySalary > 0) && (
+      {hasIncome && (
         <div className="stats-section">
           <h3 className="stats-section-title">Income</h3>
           <div className="stats">
-            {weeklySalary > 0 && (
+            {weeklyIncome > 0 && (
               <div className="stat-card">
                 <p className="stat-label">Weekly Income</p>
-                <p className="stat-value">${weeklySalary.toFixed(2)}</p>
+                <p className="stat-value">${weeklyIncome.toFixed(2)}</p>
                 <p className="stat-sub">
                   ${weeklyRemaining.toFixed(2)} after subs ({weeklyPercentage}% spent)
                 </p>
               </div>
             )}
             
-            {monthlySalary > 0 && (
-              <div className="stat-card">
-                <p className="stat-label">Monthly Income</p>
-                <p className="stat-value">${monthlySalary.toFixed(2)}</p>
-                <p className="stat-sub">
-                  ${monthlyRemaining.toFixed(2)} after subs ({monthlyPercentage}% spent)
-                </p>
-              </div>
-            )}
+            <div className="stat-card">
+              <p className="stat-label">Monthly Income</p>
+              <p className="stat-value">${monthlyIncome.toFixed(2)}</p>
+              <p className="stat-sub">
+                ${monthlyRemaining.toFixed(2)} after subs ({monthlyPercentage}% spent)
+              </p>
+            </div>
 
-            {monthlySalary > 0 && (
-              <div className="stat-card">
-                <p className="stat-label">Yearly Income</p>
-                <p className="stat-value">${yearlyIncome.toFixed(2)}</p>
-                <p className="stat-sub">
-                  ${yearlyRemaining.toFixed(2)} after subs ({yearlyPercentage}% spent)
-                </p>
-              </div>
-            )}
+            <div className="stat-card">
+              <p className="stat-label">Yearly Income</p>
+              <p className="stat-value">${yearlyIncome.toFixed(2)}</p>
+              <p className="stat-sub">
+                ${yearlyRemaining.toFixed(2)} after subs ({yearlyPercentage}% spent)
+              </p>
+            </div>
           </div>
         </div>
       )}
@@ -98,7 +131,7 @@ const Stats = ({ subscriptions, salary }) => {
       <div className="stats-section">
         <h3 className="stats-section-title">Subscriptions</h3>
         <div className="stats">
-          {weeklySalary > 0 && (
+          {weeklyIncome > 0 && (
             <div className="stat-card">
               <p className="stat-label">Weekly</p>
               <p className="stat-value">${weeklySubscriptions.toFixed(2)}</p>
