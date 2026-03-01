@@ -9,6 +9,7 @@ const SubscriptionList = ({ subscriptions, onEdit, onDelete }) => {
 
   const getPaymentStatus = (nextDate) => {
     const next = new Date(nextDate);
+    const today = new Date();
     
     if (isPast(next) && !isToday(next)) {
       return { status: 'overdue', label: 'Overdue' };
@@ -20,7 +21,7 @@ const SubscriptionList = ({ subscriptions, onEdit, onDelete }) => {
       return { status: 'tomorrow', label: 'Tomorrow' };
     }
     
-    const daysUntil = differenceInDays(next, new Date());
+    const daysUntil = differenceInDays(next, today);
     if (daysUntil <= 7) {
       return { status: 'soon', label: `${daysUntil}d` };
     }

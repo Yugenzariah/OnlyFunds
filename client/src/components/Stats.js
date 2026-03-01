@@ -131,12 +131,10 @@ const Stats = ({ subscriptions, incomes }) => {
       <div className="stats-section">
         <h3 className="stats-section-title">Subscriptions</h3>
         <div className="stats">
-          {weeklyIncome > 0 && (
-            <div className="stat-card">
-              <p className="stat-label">Weekly</p>
-              <p className="stat-value">${weeklySubscriptions.toFixed(2)}</p>
-            </div>
-          )}
+          <div className="stat-card">
+            <p className="stat-label">Weekly</p>
+            <p className="stat-value">${weeklySubscriptions.toFixed(2)}</p>
+          </div>
           
           <div className="stat-card">
             <p className="stat-label">Monthly</p>
