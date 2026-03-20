@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import './styles/App.css';
-import SubscriptionForm from './components/SubscriptionForm';
-import SubscriptionList from './components/SubscriptionList';
-import Stats from './components/Stats';
-import IncomeManager from './components/IncomeManager';
-import SavingsCalculator from './components/SavingsCalculator';
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import "./styles/App.css";
+import SubscriptionForm from "./components/SubscriptionForm";
+import SubscriptionList from "./components/SubscriptionList";
+import Stats from "./components/Stats";
+import IncomeManager from "./components/IncomeManager";
+import SavingsCalculator from "./components/SavingsCalculator";
 
 function App() {
   const [subscriptions, setSubscriptions] = useState([]);
@@ -23,31 +23,31 @@ function App() {
 
   const fetchSubscriptions = async () => {
     try {
-      const response = await axios.get('/api/subscriptions');
+      const response = await axios.get("/api/subscriptions");
       setSubscriptions(response.data);
       setLoading(false);
     } catch (error) {
-      console.error('Error fetching subscriptions:', error);
+      console.error("Error fetching subscriptions:", error);
       setLoading(false);
     }
   };
 
   const fetchIncomes = async () => {
     try {
-      const response = await axios.get('/api/income');
+      const response = await axios.get("/api/income");
       setIncomes(response.data);
     } catch (error) {
-      console.error('Error fetching incomes:', error);
+      console.error("Error fetching incomes:", error);
     }
   };
 
   const handleAddSubscription = async (subscriptionData) => {
     try {
-      await axios.post('/api/subscriptions', subscriptionData);
+      await axios.post("/api/subscriptions", subscriptionData);
       fetchSubscriptions();
       setShowForm(false);
     } catch (error) {
-      console.error('Error adding subscription:', error);
+      console.error("Error adding subscription:", error);
     }
   };
 
@@ -57,17 +57,17 @@ function App() {
       fetchSubscriptions();
       setEditingSubscription(null);
     } catch (error) {
-      console.error('Error updating subscription:', error);
+      console.error("Error updating subscription:", error);
     }
   };
 
   const handleDeleteSubscription = async (id) => {
-    if (window.confirm('Delete this subscription?')) {
+    if (window.confirm("Delete this subscription?")) {
       try {
         await axios.delete(`/api/subscriptions/${id}`);
         fetchSubscriptions();
       } catch (error) {
-        console.error('Error deleting subscription:', error);
+        console.error("Error deleting subscription:", error);
       }
     }
   };
@@ -88,28 +88,31 @@ function App() {
         <div className="header-content">
           <h1 className="title">Yugens Hub</h1>
           <div className="header-actions">
-            <button 
-              className="settings-button"
+            <button
+              className="icon-button"
               onClick={() => setShowSavingsCalculator(true)}
               title="Savings Calculator"
             >
-              📊
+              <span className="icon">📊</span>
+              <span className="label">Calculate Savings</span>
             </button>
-            <button 
-              className="settings-button"
+            <button
+              className="icon-button"
               onClick={() => setShowIncomeManager(true)}
               title="Income Streams"
             >
-              $
+              <span className="icon">$</span>
+              <span className="label">Income</span>
             </button>
-            <button 
-              className="add-button"
+            <button
+              className="icon-button"
               onClick={() => {
                 setEditingSubscription(null);
                 setShowForm(!showForm);
               }}
             >
-              {showForm ? '×' : '+'}
+              <span className="icon">{showForm ? "×" : "+"}</span>
+              <span className="label">Add Expenses</span>
             </button>
           </div>
         </div>
@@ -119,9 +122,11 @@ function App() {
         <div className="container">
           {showForm && (
             <SubscriptionForm
-              onSubmit={editingSubscription 
-                ? (data) => handleUpdateSubscription(editingSubscription._id, data)
-                : handleAddSubscription
+              onSubmit={
+                editingSubscription
+                  ? (data) =>
+                      handleUpdateSubscription(editingSubscription._id, data)
+                  : handleAddSubscription
               }
               onCancel={handleCancelEdit}
               initialData={editingSubscription}
@@ -129,7 +134,7 @@ function App() {
           )}
 
           {showIncomeManager && (
-            <IncomeManager 
+            <IncomeManager
               onClose={() => setShowIncomeManager(false)}
               onUpdate={fetchIncomes}
             />
@@ -152,7 +157,7 @@ function App() {
           ) : subscriptions.length === 0 ? (
             <div className="empty-state">
               <p>No subscriptions yet</p>
-              <button 
+              <button
                 className="empty-button"
                 onClick={() => setShowForm(true)}
               >

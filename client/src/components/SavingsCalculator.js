@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { differenceInDays, differenceInWeeks, differenceInMonths, format } from 'date-fns';
+import { differenceInDays, format } from 'date-fns';
 
 const SavingsCalculator = ({ subscriptions, incomes, onClose }) => {
   const [targetDate, setTargetDate] = useState('');
@@ -17,8 +17,10 @@ const SavingsCalculator = ({ subscriptions, incomes, onClose }) => {
     }
 
     const days = differenceInDays(target, today);
-    const weeks = differenceInWeeks(target, today);
-    const months = differenceInMonths(target, today);
+    
+    // Convert days to months for display
+    const months = (days / 30.44).toFixed(1); // Average days per month
+    const weeksDecimal = days / 7;
 
     // Calculate total monthly subscriptions
     const totalMonthlySubscriptions = subscriptions
@@ -68,14 +70,26 @@ const SavingsCalculator = ({ subscriptions, incomes, onClose }) => {
         return total + monthlyIncome;
       }, 0);
 
-    const totalIncome = totalMonthlyIncome * months;
-    const totalSubscriptions = totalMonthlySubscriptions * months;
+    // Calculate based on actual days instead of rounded months
+    const totalIncome = (totalMonthlyIncome / 30.44) * days;
+    const totalSubscriptions = (totalMonthlySubscriptions / 30.44) * days;
     const totalSavings = totalIncome - totalSubscriptions;
+
+    // Format period text
+    let periodText = '';
+    if (days < 7) {
+      periodText = `${days} day${days !== 1 ? 's' : ''}`;
+    } else if (days < 60) {
+      const weeks = Math.floor(weeksDecimal);
+      periodText = `${weeks} week${weeks !== 1 ? 's' : ''}`;
+    } else {
+      periodText = `${months} month${months !== '1.0' ? 's' : ''}`;
+    }
 
     setResult({
       targetDate: format(target, 'MMMM d, yyyy'),
       days,
-      period: `${months} month${months !== 1 ? 's' : ''}`,
+      period: periodText,
       totalIncome,
       totalSubscriptions,
       totalSavings
