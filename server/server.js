@@ -20,6 +20,7 @@ mongoose.connect(MONGODB_URI)
 // Routes
 app.use('/api/subscriptions', require('./routes/subscriptions'));
 app.use('/api/income', require('./routes/income'));
+app.use('/api/expenses', require('./routes/expenses'));
 
 // Health check
 app.get('/api/health', (req, res) => {

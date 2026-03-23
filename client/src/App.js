@@ -6,6 +6,7 @@ import SubscriptionList from "./components/SubscriptionList";
 import Stats from "./components/Stats";
 import IncomeManager from "./components/IncomeManager";
 import SavingsCalculator from "./components/SavingsCalculator";
+import ExpenseTracker from "./components/ExpenseTracker";
 
 function App() {
   const [subscriptions, setSubscriptions] = useState([]);
@@ -15,6 +16,7 @@ function App() {
   const [showSavingsCalculator, setShowSavingsCalculator] = useState(false);
   const [editingSubscription, setEditingSubscription] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [showExpenseTracker, setShowExpenseTracker] = useState(false);
 
   useEffect(() => {
     fetchSubscriptions();
@@ -75,6 +77,14 @@ function App() {
   const handleEditClick = (subscription) => {
     setEditingSubscription(subscription);
     setShowForm(true);
+
+    // Scroll to form
+    setTimeout(() => {
+      document.querySelector(".form")?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }, 100);
   };
 
   const handleCancelEdit = () => {
@@ -86,7 +96,7 @@ function App() {
     <div className="app">
       <header className="header">
         <div className="header-content">
-          <h1 className="title">Yugens Hub</h1>
+          <h1 className="title">OnlyFunds</h1>
           <div className="header-actions">
             <button
               className="icon-button"
@@ -112,7 +122,15 @@ function App() {
               }}
             >
               <span className="icon">{showForm ? "×" : "+"}</span>
-              <span className="label">Add Expenses</span>
+              <span className="label">Add Subscription</span>
+            </button>
+            <button
+              className="icon-button"
+              onClick={() => setShowExpenseTracker(true)}
+              title="Expense Tracker"
+            >
+              <span className="icon">💰</span>
+              <span className="label">Expenses</span>
             </button>
           </div>
         </div>
@@ -146,6 +164,10 @@ function App() {
               incomes={incomes}
               onClose={() => setShowSavingsCalculator(false)}
             />
+          )}
+
+          {showExpenseTracker && (
+            <ExpenseTracker onClose={() => setShowExpenseTracker(false)} />
           )}
 
           {!loading && subscriptions.length > 0 && (
